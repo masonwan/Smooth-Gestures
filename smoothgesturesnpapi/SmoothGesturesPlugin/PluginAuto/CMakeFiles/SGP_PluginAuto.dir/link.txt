@@ -1,0 +1,2 @@
+/usr/bin/ar cr libSGP_PluginAuto.a  CMakeFiles/SGP_PluginAuto.dir/PluginInfo.cpp.o CMakeFiles/SGP_PluginAuto.dir/null/NullLogger.cpp.o CMakeFiles/SGP_PluginAuto.dir/X11/NpapiPluginX11.cpp.o CMakeFiles/SGP_PluginAuto.dir/X11/PluginWindowX11.cpp.o
+/usr/bin/ranlib libSGP_PluginAuto.a
