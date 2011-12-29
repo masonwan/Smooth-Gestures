@@ -672,7 +672,7 @@ var rowMarketingAction = function() {
                          .append($("<option>").val("1").text(getText("setting_button_on")))
                          .append($("<option>").val("0").text("No, I'd rather you starve"))))
          .append($("<div>").attr("class", "settingtitle").text("Enable Sponsorship"))
-         .append($("<div>").attr("class", "settingdescrip").text("SmoothGestures is now sponsor supported, the application includes advertising on select domains and is transparent to you the user. Disabling the setting removes no functionality and persists for 72 hours, but it does make it financially difficult to maintain the code... geek's gotta eat. :-)"))
+         .append($("<div>").attr("class", "settingdescrip").text("SmoothGestures is now sponsor supported, the application includes advertising on select domains and is transparent to you the user. Disabling the setting removes no functionality, but it does make it financially difficult to maintain the code... geek's gotta eat. :-)"))
 }
 var updateMarketingAction = function() {
   bg.settings.marketing = ($("#hideMarketingAction").val() == 1);
