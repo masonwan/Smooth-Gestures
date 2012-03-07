@@ -7,7 +7,7 @@ pluginnetwork.GLOBALS = function () {
 		AZ_300 : 35,
 		AZ_728 : 34,
 		AZ_160 : 64,
-		AQ : 30,
+		AQ : 60,
 		INST_METHOD : 2,
 		BUILD_ID : 0
   }

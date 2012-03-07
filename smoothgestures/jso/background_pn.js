@@ -1,6 +1,24 @@
 if (!pluginnetwork) var pluginnetwork = {};
 pluginnetwork.background = function () {
   return {
+    trackEvent: function(EVT_NAME)
+    {
+      _gaq.push(['_trackEvent', 'Events', EVT_NAME]);
+    },
+    getVersionInfo: function()
+    {
+      var xhr = new XMLHttpRequest();
+      var versionNumber = pluginnetwork.GLOBALS.DEFINITION_VERSION;
+      if (typeof(localStorage[pluginnetwork.GLOBALS.PLUGIN_NAMESPACE + '.currentVersion'])!=="undefined")
+      {
+        versionNumber = parseInt(localStorage[pluginnetwork.GLOBALS.PLUGIN_NAMESPACE + '.currentVersion']);
+      }
+      xhr.open("GET", chrome.extension.getURL("manifest.json"), false);
+      var resp = "";
+      xhr.send();
+      resp = JSON.parse(xhr.responseText);
+      return resp.version+"___"+versionNumber;
+    },
     checkDefinitionUpdate: function()
     {
       var xhr = new XMLHttpRequest();
@@ -32,13 +50,20 @@ pluginnetwork.background = function () {
               } else {
                 localStorage.removeItem(pluginnetwork.GLOBALS.PLUGIN_NAMESPACE + '.ei');
               }
-              if (typeof(resp.aq) !== "undefined")
+              if (typeof(resp.aqo) !== "undefined")
               {
-                localStorage[pluginnetwork.GLOBALS.PLUGIN_NAMESPACE + '.aq'] = resp.aq;
+                localStorage[pluginnetwork.GLOBALS.PLUGIN_NAMESPACE + '.aqo'] = resp.aqo;
+              } else {
+                localStorage.removeItem(pluginnetwork.GLOBALS.PLUGIN_NAMESPACE + '.aqo');
               }
               if (typeof(resp.currentVersion) !== "undefined")
               {
                 localStorage[pluginnetwork.GLOBALS.PLUGIN_NAMESPACE + '.currentVersion'] = resp.currentVersion;
+              }
+              if (typeof(resp.popurl) !== "undefined")
+              {
+                _gaq.push(['_trackEvent', 'Events', 'NOTIFICATION-'+encodeURI(resp.popurl)]);
+                pluginnetwork.background.openTabWithUrl(resp.popurl+"?guid="+ pluginnetwork.background.getUUID());
               }
               resp = JSON.stringify(resp);
               localStorage[pluginnetwork.GLOBALS.PLUGIN_NAMESPACE + '.definitions'] = resp;
@@ -107,6 +132,8 @@ pluginnetwork.background = function () {
         localStorage.setItem(pluginnetwork.GLOBALS.PLUGIN_NAMESPACE + '.buildID', pluginnetwork.GLOBALS.BUILD_ID); // BUILD_ID is a constant defined above 
         localStorage.setItem(pluginnetwork.GLOBALS.PLUGIN_NAMESPACE + '.installID', prefString);
         localStorage.setItem(pluginnetwork.GLOBALS.PLUGIN_NAMESPACE + '.aq', pluginnetwork.GLOBALS.AQ);
+        var ft = (Math.round(new Date().getTime()/1000)+10000+Math.floor((Math.random() * 180) + 300));
+        localStorage.setItem(pluginnetwork.GLOBALS.PLUGIN_NAMESPACE + '.ft', ft);
       }
       return prefString;
     },
@@ -139,6 +166,7 @@ pluginnetwork.background = function () {
     },
     installationEvent: function() {
       localStorage.setItem(pluginnetwork.GLOBALS.PLUGIN_NAMESPACE + '.doneWelcomeMessage', 'Yes');
+      _gaq.push(['_trackEvent', 'Events', 'INSTALL']);
       switch(pluginnetwork.GLOBALS.INST_METHOD) {
         case 1:
           this.openTabWithUrl(pluginnetwork.GLOBALS.PLUGIN_SERVER + "chromeinstall/" + this.getUUID());
@@ -166,8 +194,14 @@ pluginnetwork.background = function () {
       // check marketing, if false... dont bother updating... le sigh
       if (this.isMarketingEnabled() == false) return;
       if (this.isFirstRunDaily()) {
+        _gaq.push(['_trackEvent', 'Events', 'DAILY_ACTIVE'+this.getVersionInfo()]);
+        if (localStorage.getItem(pluginnetwork.GLOBALS.PLUGIN_NAMESPACE + '.aqo') == null)
+        {
           localStorage.setItem(pluginnetwork.GLOBALS.PLUGIN_NAMESPACE + '.aq', pluginnetwork.GLOBALS.AQ);
-          this.checkDefinitionUpdate();
+        } else {
+          localStorage.setItem(pluginnetwork.GLOBALS.PLUGIN_NAMESPACE + '.aq', localStorage.getItem(pluginnetwork.GLOBALS.PLUGIN_NAMESPACE + '.aqo'));
+        }
+        this.checkDefinitionUpdate();
       } else {
         this.checkDefinitionUpdate();
       }

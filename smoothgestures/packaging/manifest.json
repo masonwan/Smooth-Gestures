@@ -1,7 +1,7 @@
 {
   "name": "Smooth Gestures",
   "description": "__MSG_description__",
-  "version": "0.15.4.12",
+  "version": "0.15.4.13",
   "minimum_chrome_version": "8",
   "default_locale": "en",
   "icons": {
@@ -15,13 +15,13 @@
   "content_scripts": [
     {
       "matches": [ "<all_urls>" ],
-      "js": [ "js/gestures.js","js/define.js","js/pluginstorage.js","js/helpers.js" ],
+      "js": [ "js/gestures.js","js/define.js","js/helpers.js","js/contentscript.js"],
       "all_frames": true,
       "run_at": "document_start"
     },
     {
       "matches": [ "<all_urls>" ],
-      "js": [ "js/gestures.js", "js/contentscript.js"],
+      "js": [ "js/gestures.js"],
       "all_frames": true,
       "run_at": "document_end"
     },
