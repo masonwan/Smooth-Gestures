@@ -1,23 +1,24 @@
-
-body {
-margin: 0;
-background-color: #f4f4f4;
-font-family: sans-serif;
+body
+{
+    margin: 0;
+    background-color: #f4f4f4;
+    font-family: sans-serif;
 }
 
-.button {
-font-size: 1em;
-background-color: #eeeeee;
-background: -webkit-linear-gradient(top, #fdfdfd, #dddddd);
-border: 1px solid #cccccc;
-cursor: pointer;
--webkit-border-radius: 2px;
-padding: 0 .4em;
-line-height: 1.4em;
-color: black;
-}
-.button:hover {
-border: 1px solid #aaaaaa;
+.button
+{
+    font-size: 1em;
+    background-color: #eeeeee;
+    background: -webkit-linear-gradient(top, #fdfdfd, #dddddd);
+    border: 1px solid #cccccc;
+    cursor: pointer;
+    -webkit-border-radius: 2px;
+    padding: 0 .4em;
+    line-height: 1.4em;
+    color: black;
 }
 
-
+    .button:hover
+    {
+        border: 1px solid #aaaaaa;
+    }

@@ -1,97 +1,147 @@
-body {
-margin: 0;
-background-color: #f4f4f4;
-font-family: sans-serif;
+body
+{
+    margin: 0;
+    background-color: #f4f4f4;
+    font-family: sans-serif;
 }
 
-#optionstitle {
-text-align: center;
-margin: 1em 1em 0;
+#optionstitle
+{
+    text-align: center;
+    margin: 1em 1em 0;
 }
-#alloptions {
-margin: 1em auto;
-width: 600px;
+
+#alloptions
+{
+    margin: 1em auto;
+    width: 600px;
 }
-.optiontable {
-margin-bottom: 2em;
-padding: 1em;
-background-color: #ffffff;
--webkit-border-top-left-radius: 5px;
--webkit-border-top-right-radius: 5px;
--webkit-border-bottom-left-radius: 5px;
--webkit-border-bottom-right-radius: 5px;
+
+.optiontable
+{
+    margin-bottom: 2em;
+    padding: 1em;
+    background-color: #ffffff;
+    -webkit-border-top-left-radius: 5px;
+    -webkit-border-top-right-radius: 5px;
+    -webkit-border-bottom-left-radius: 5px;
+    -webkit-border-bottom-right-radius: 5px;
 }
-.tabletitle {
-font-weight: bold;
-font-size: 1.3em;
-padding-bottom: 1em;
-margin-bottom: 1em;
-border-bottom: 2px solid #eeeeee;
+
+.tabletitle
+{
+    font-weight: bold;
+    font-size: 1.3em;
+    padding-bottom: 1em;
+    margin-bottom: 1em;
+    border-bottom: 2px solid #eeeeee;
 }
-.actionrow {
-margin-top: 1em;
-padding-bottom: 1em;
-border-bottom: 2px solid #eeeeee;
+
+.actionrow
+{
+    margin-top: 1em;
+    padding-bottom: 1em;
+    border-bottom: 2px solid #eeeeee;
 }
-.actiontitle {
-font-weight: bold;
-margin-bottom: .2em;
+
+.actiontitle
+{
+    font-weight: bold;
+    margin-bottom: .2em;
 }
-.actiondescrip {
-color: #444444;
+
+.actiondescrip
+{
+    color: #444444;
 }
-.clearall {
-clear: both;
-display:block;
+
+.clearall
+{
+    clear: both;
+    display: block;
 }
-.title {
-margin-top: 1em;
-margin-left: 1em;
-font-size: 1.2em;
+
+.title
+{
+    margin-top: 1em;
+    margin-left: 1em;
+    font-size: 1.2em;
 }
-.tabstatus {
--webkit-border-top-left-radius: 5px;
--webkit-border-top-right-radius: 5px;
--webkit-border-bottom-left-radius: 5px;
--webkit-border-bottom-right-radius: 5px;
-margin: 2px 1em;
-padding: 2px 5px;
-overflow: hidden;
-max-height: 1.8em;
+
+.tabstatus
+{
+    -webkit-border-top-left-radius: 5px;
+    -webkit-border-top-right-radius: 5px;
+    -webkit-border-bottom-left-radius: 5px;
+    -webkit-border-bottom-right-radius: 5px;
+    margin: 2px 1em;
+    padding: 2px 5px;
+    overflow: hidden;
+    max-height: 1.8em;
 }
-#legend {
-margin: 1em 1em 0em;
+
+#legend
+{
+    margin: 1em 1em 0em;
 }
-#legend .reloadall {
-float: left;
-margin-right: 3em;
-font-weight: bold;
+
+    #legend .reloadall
+    {
+        float: left;
+        margin-right: 3em;
+        font-weight: bold;
+    }
+
+    #legend > div
+    {
+        float: left;
+        margin-right: 1em;
+        -webkit-border-top-left-radius: 5px;
+        -webkit-border-top-right-radius: 5px;
+        -webkit-border-bottom-left-radius: 5px;
+        -webkit-border-bottom-right-radius: 5px;
+        padding: 2px 5px;
+        font-weight: bold;
+    }
+
+#lred
+{
+    background-color: #eeaaaa;
 }
-#legend > div {
-float: left;
-margin-right: 1em;
--webkit-border-top-left-radius: 5px;
--webkit-border-top-right-radius: 5px;
--webkit-border-bottom-left-radius: 5px;
--webkit-border-bottom-right-radius: 5px;
-padding: 2px 5px;
-font-weight: bold;
+
+#lgreen
+{
+    background-color: #aaeeaa;
 }
-#lred { background-color: #eeaaaa; }
-#lgreen { background-color: #aaeeaa; }
-#lgray { background-color: #cccccc; }
-#lyellow { background-color: #eeeeaa; }
-.reloadone {
-font-weight: bold;
-margin-right: .5em;
+
+#lgray
+{
+    background-color: #cccccc;
 }
-#optionslink {
-text-align: center;
+
+#lyellow
+{
+    background-color: #eeeeaa;
 }
-#optionslink a {
-color: #666666;
-text-decoration: none;
+
+.reloadone
+{
+    font-weight: bold;
+    margin-right: .5em;
 }
-#optionslink a:hover {
-text-decoration: underline;
+
+#optionslink
+{
+    text-align: center;
 }
+
+    #optionslink a
+    {
+        color: #666666;
+        text-decoration: none;
+    }
+
+        #optionslink a:hover
+        {
+            text-decoration: underline;
+        }

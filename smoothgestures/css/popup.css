@@ -1,55 +1,73 @@
-body {
-background-color: #f4f4f4;
-font-family: sans-serif;
-color: black;
-margin: 0;
-width: 300px;
-font-size: .8em;
-}
-p {
-margin: .5em .5em 1em;
-color: #333;
-}
-#statuslight {
-margin: .5em;
-float: left;
-width: 1em;
-height: 1em;
-border: 1px solid #888;
-border-radius: .5em;
-background-color: black;
-background-image: -webkit-radial-gradient(60% 40%, farthest-side, rgba(255,255,255,.8), rgba(255,255,255,.3));
-}
-#statuslight.red {
-background-color: red;
-}
-#statuslight.yellow {
-background-color: rgb(240,240,0);
-}
-#statuslight.green {
-background-color: rgb(0,200,0);
-}
-h1 {
-font-size: 1.2em;
-margin: 0;
-padding: .5em .5em 0;
-}
-h1 + p {
-margin-top: 0;
-color: #888;
-}
-.sgbutton {
-font-size: 1em;
-background-color: #eeeeee;
-background: -webkit-linear-gradient(top, #fdfdfd, #dddddd);
-border: 1px solid #cccccc;
-cursor: pointer;
--webkit-border-radius: 2px;
-padding: 0 .4em;
-line-height: 1.4em;
-margin: .2em;
-}
-.sgbutton:hover {
-border: 1px solid #aaaaaa;
+body
+{
+    background-color: #f4f4f4;
+    font-family: sans-serif;
+    color: black;
+    margin: 0;
+    width: 300px;
+    font-size: .8em;
 }
 
+p
+{
+    margin: .5em .5em 1em;
+    color: #333;
+}
+
+#statuslight
+{
+    margin: .5em;
+    float: left;
+    width: 1em;
+    height: 1em;
+    border: 1px solid #888;
+    border-radius: .5em;
+    background-color: black;
+    background-image: -webkit-radial-gradient(60% 40%, farthest-side, rgba(255,255,255,.8), rgba(255,255,255,.3));
+}
+
+    #statuslight.red
+    {
+        background-color: red;
+    }
+
+    #statuslight.yellow
+    {
+        background-color: rgb(240,240,0);
+    }
+
+    #statuslight.green
+    {
+        background-color: rgb(0,200,0);
+    }
+
+h1
+{
+    font-size: 1.2em;
+    margin: 0;
+    padding: .5em .5em 0;
+}
+
+    h1 + p
+    {
+        margin-top: 0;
+        color: #888;
+    }
+
+.sgbutton
+{
+    font-size: 1em;
+    background-color: #eeeeee;
+    background: -webkit-linear-gradient(top, #fdfdfd, #dddddd);
+    border: 1px solid #cccccc;
+    cursor: pointer;
+    -webkit-border-radius: 2px;
+    padding: 0 .4em;
+    line-height: 1.4em;
+    margin: .2em;
+}
+
+    .sgbutton:hover
+    {
+        border: 1px solid #aaaaaa;
+    }
