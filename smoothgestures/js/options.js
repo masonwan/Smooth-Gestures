@@ -22,21 +22,18 @@ var optionsUpdated = function (blockGenerate) {
 	if (!blockGenerate) generateOptions();
 }
 
-
-
-
 document.title = getText("name") + ': ' + getText("options_title");
 $("body").append($('<div>').attr('id', 'contents-contain').append($('<div>').attr('id', 'contents')
-                 .append($('<div>').attr('class', 'title').text(getText("options_contents_actions")))
-                 .append($('<div>').attr('id', 'contentsactions'))
-                 .append($('<div>').attr('class', 'title').text(getText("options_contents_settings")))
-                 .append($('<div>').attr('id', 'contentssettings'))
-                 .append($("<ul>")
-                   .append($('<li id="translatemess">Help <a id="translatelink" href="translate.html">Translate SG</a></li>'))
-                   .append($('<li id="supportmess">Find a bug? <a id="supportlink" href="http://code.google.com/p/smoothgestures-chromium/issues/list">Report it</a></li>')))))
-         .append($('<h1 id="optionstitle"><img src="im/icon48.png"/> ' + getText("name") + ': ' + getText("options_title") + '</h1>'))
-         .append($('<div>').attr('id', 'addgesture')
-           .append($("<div>").attr("id", "addgesturebutton").html("<span>+</span> " + chrome.i18n.getMessage("options_button_startaddgesture")).attr("tabindex", 0).click(function () { addGesture(null); })))
+				 .append($('<div>').attr('class', 'title').text(getText("options_contents_actions")))
+				 .append($('<div>').attr('id', 'contentsactions'))
+				 .append($('<div>').attr('class', 'title').text(getText("options_contents_settings")))
+				 .append($('<div>').attr('id', 'contentssettings'))
+				 .append($("<ul>")
+				   .append($('<li id="translatemess">Help <a id="translatelink" href="translate.html">Translate SG</a></li>'))
+				   .append($('<li id="supportmess">Find a bug? <a id="supportlink" href="http://code.google.com/p/smoothgestures-chromium/issues/list">Report it</a></li>')))))
+		 .append($('<h1 id="optionstitle"><img src="im/icon48.png"/> ' + getText("name") + ': ' + getText("options_title") + '</h1>'))
+		 .append($('<div>').attr('id', 'addgesture')
+		   .append($("<div>").attr("id", "addgesturebutton").html("<span>+</span> " + chrome.i18n.getMessage("options_button_startaddgesture")).attr("tabindex", 0).click(function () { addGesture(null); })))
 
 if (bg.settings.sendStats == undefined)
 	$("#optionstitle").after($('<div>').attr('id', 'note_sendStats').attr('class', 'note green')
@@ -398,24 +395,46 @@ var htmlDecode = function (input) {
 	e.innerHTML = input.replace(/</g, "[leftangle]");
 	return e.childNodes[0].nodeValue.replace(/\[leftangle\]/g, "<");
 }
+
 var doImport = function () {
 	var finput = this;
-	if (this.files.length <= 0) return;
+
+	if (this.files.length <= 0)
+		return;
+
 	var reader = new FileReader();
+
 	reader.onload = function (e) {
-		var res = reader.result;
-		res = res.substring(res.indexOf("{"), res.lastIndexOf("}") + 1);
-		alert(res)
-		alert(htmlDecode(res));
-		res = htmlDecode(res);
-		var importJSON = JSON.parse(res);
+		var result = reader.result.substring(result.indexOf("{"), result.lastIndexOf("}") + 1);
+		result = htmlDecode(result);
+
+		// Show the input in alert dialog.
+		//alert(result);
+		//alert(htmlDecode(result));
+
+		var importJSON = JSON.parse(result);
 		finput.value = "";
-		if (importJSON.title != "Smooth Gestures Settings") { alert("Error Importing Settings"); return; }
-		if (importJSON.gestures) bg.gestures = importJSON.gestures;
-		for (x in importJSON.settings) bg.settings[x] = importJSON.settings[x];
-		for (x in importJSON.customActions) bg.customActions[x] = importJSON.customActions[x];
+
+		if (importJSON.title != "Smooth Gestures Settings") {
+			alert("Error Importing Settings");
+			return;
+		}
+
+		if (importJSON.gestures) {
+			bg.gestures = importJSON.gestures;
+		}
+
+		for (x in importJSON.settings) {
+			bg.settings[x] = importJSON.settings[x];
+		}
+
+		for (x in importJSON.customActions) {
+			bg.customActions[x] = importJSON.customActions[x];
+		}
+
 		optionsUpdated();
 	}
+
 	reader.readAsText(this.files[0]);
 }
 
@@ -477,7 +496,7 @@ var updateTrailColor = function () {
 	optionsUpdated(true);
 }
 var refreshTrailColor = function () {
-	$("#trailColorR, #trailColorG, #trailColorB, #trailColorA").css({ "margin": "5px", "width": "169px", /*"border":"2px solid",*/ "border-radius": "6px" }).children().css({ "padding": "0", "margin": "1px 6px", "width": "155px" });
+	$("#trailColorR, #trailColorG, #trailColorB, #trailColorA").css({ "margin": "5px", "width": "169px", /*"border":"2px solid",*/"border-radius": "6px" }).children().css({ "padding": "0", "margin": "1px 6px", "width": "155px" });
 	$("#trailColorR").css({ "background": "-webkit-linear-gradient(left,rgba(255,0,0,0),rgba(255,0,0,1))" });
 	$("#trailColorG").css({ "background": "-webkit-linear-gradient(left,rgba(0,255,0,0),rgba(0,255,0,1))" });
 	$("#trailColorB").css({ "background": "-webkit-linear-gradient(left,rgba(0,0,255,0),rgba(0,0,255,1))" });
