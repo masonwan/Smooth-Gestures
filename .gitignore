@@ -17,3 +17,7 @@ Desktop.ini
 
 # Recycle Bin used on file shares
 $RECYCLE.BIN/
+
+# Packaged files
+/smoothgestures.crx
+/smoothgestures.pem
