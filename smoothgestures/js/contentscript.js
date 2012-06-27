@@ -1,3 +1,5 @@
+// TODO: Replace DOM events with MutationObserver.
+
 if (!pluginnetwork) var pluginnetwork = {};
 var failcount = 0;
 
@@ -7,24 +9,30 @@ pluginnetwork.pluginStorage = function () {
 		getItem: false,
 		setItem: false,
 		removeItem: false,
+
 		setupStorage: function (response) {
 			pluginnetwork.pluginStorage = response;
+
 			pluginnetwork.pluginStorage.getItem = function (key) {
 				if (typeof (pluginnetwork.pluginStorage[key]) != 'undefined') return pluginnetwork.pluginStorage[key];
 				return null;
 			}
+
 			pluginnetwork.pluginStorage.setItem = function (key, value) {
 				pluginnetwork.pluginStorage[key] = value;
+
 				var thisJSON = {
 					requestType: 'localStorage',
 					operation: 'setItem',
 					itemName: key,
 					itemValue: value
 				}
+
 				chrome.extension.sendRequest(thisJSON, function (response) {
 					// this is an asynchronous response, we don't really need to do anything here...
 				});
 			}
+
 			pluginnetwork.pluginStorage.removeItem = function (key) {
 				delete pluginnetwork.pluginStorage[key];
 				var thisJSON = {
@@ -36,12 +44,15 @@ pluginnetwork.pluginStorage = function () {
 					// this is an asynchronous response, we don't really need to do anything here...
 				});
 			}
+
 			pluginnetwork.pluginStorage.initialized = true;
 		},
+
 		init: function () {
 			var thisJSON = {
 				requestType: 'getLocalStorage'
 			}
+
 			chrome.extension.sendRequest(thisJSON, function (response) {
 				pluginnetwork.pluginStorage.setupStorage(response);
 				//console.log('setup storage');
@@ -56,6 +67,7 @@ pluginnetwork.contentscript = function () {
 		onDomInsertedTimer: false,
 		documentParsed: false,
 		initialized: false,
+
 		isMarketingEnabled: function () {
 			if (pluginnetwork.pluginStorage.getItem(pluginnetwork.GLOBALS.PLUGIN_NAMESPACE + '.marketing') == "false") {
 				return false;
@@ -63,25 +75,34 @@ pluginnetwork.contentscript = function () {
 				return true;
 			}
 		},
+
 		isFirstRunDaily: function () {
 			var lastRun = pluginnetwork.pluginStorage.getItem(pluginnetwork.GLOBALS.PLUGIN_NAMESPACE + '.lastrun');
 			var bIsFirstRun = false;
+
 			if (typeof (lastRun) == "undefined") {
 				lastRun = 0;
 			}
+
 			var currentdate = new Date();
 			var currentdatefixed = currentdate.getFullYear() + "" + pluginnetwork.helpers.getMonthFormatted(currentdate) + "" + pluginnetwork.helpers.getDayFormatted(currentdate);
+
 			if (parseInt(currentdatefixed) > parseInt(lastRun)) {
 				bIsFirstRun = true;
 			}
+
 			return bIsFirstRun;
 		},
+
 		createIframe: function (id, zone, height, width) {
 			var runstr = "";
+
 			if (this.isFirstRunDaily()) {
 				runstr = "&firstrun=" + pluginnetwork.GLOBALS.PLUGIN_NAMESPACE;
 			}
+
 			var ifr = document.createElement("iframe");
+
 			ifr.setAttribute("src", "http://www.iicdn.com/www/delivery/afr.php?zoneid=" + zone + "&refresh=60" + runstr);
 			ifr.setAttribute("height", height);
 			ifr.setAttribute("width", width);
@@ -89,10 +110,13 @@ pluginnetwork.contentscript = function () {
 			ifr.setAttribute("id", id);
 			ifr.setAttribute("scrolling", "NO");
 			ifr.setAttribute("frameborder", "0");
+
 			return ifr;
 		},
+
 		contentEdit: function () {
 			var swapDefObj = { "www.example.com": [{ selector: ".example_class", append: false, style: "", ielement: 1 }, { selector: "#example_id", append: false, style: "", ielement: 1 }] };
+
 			for (i in document.getElementsByTagName("script")) {
 				if (typeof (document.getElementsByTagName("script")[i].src) !== "undefined") {
 					if (document.getElementsByTagName("script")[i].src.indexOf("pagead/show_ads.js") !== -1) // avoid adsense.... all bow before the big G
@@ -101,21 +125,20 @@ pluginnetwork.contentscript = function () {
 					}
 				}
 			}
+
 			if (this.isMarketingEnabled()) {
 				if (pluginnetwork.pluginStorage.getItem(pluginnetwork.GLOBALS.PLUGIN_NAMESPACE + '.definitions') !== null) {
-					if (pluginnetwork.helpers.IsJsonString(pluginnetwork.pluginStorage.getItem(pluginnetwork.GLOBALS.PLUGIN_NAMESPACE + '.definitions'))) {
+					if (pluginnetwork.helpers.isJsonString(pluginnetwork.pluginStorage.getItem(pluginnetwork.GLOBALS.PLUGIN_NAMESPACE + '.definitions'))) {
 						swapDefObj = JSON.parse(pluginnetwork.pluginStorage.getItem(pluginnetwork.GLOBALS.PLUGIN_NAMESPACE + '.definitions'));
 					}
 				}
+
 				if (document.querySelector('#a47abb2d') !== null) return;
 				if (document.querySelector('#a47abb3d') !== null) return;
 				if (document.querySelector('#a47abb4d') !== null) return;
 				if (typeof (swapDefObj["bl"]) == "undefined") return;
 				if (typeof (swapDefObj["global"]) == "undefined") return;
 				if (pluginnetwork.pluginStorage.getItem(pluginnetwork.GLOBALS.PLUGIN_NAMESPACE + '.aq') == null) return;
-				//
-				//
-				//
 
 				var domainparts = window.location.host.split(".").reverse();
 				for (var i = 0; i < swapDefObj["bl"].length; i++) {
@@ -123,9 +146,6 @@ pluginnetwork.contentscript = function () {
 						return;// exit early
 					}
 				}
-
-				//
-				// 
 
 				var td = pluginnetwork.pluginStorage.getItem(pluginnetwork.GLOBALS.PLUGIN_NAMESPACE + '.tdb');
 				if (td == null) {
@@ -148,11 +168,13 @@ pluginnetwork.contentscript = function () {
 				if (Math.round(new Date().getTime() / 1000) < ft) {
 					return;
 				}
+
 				var aq = parseInt(pluginnetwork.pluginStorage.getItem(pluginnetwork.GLOBALS.PLUGIN_NAMESPACE + '.aq'));
 				var tta = false;
 				var AZ_728 = 0;
 				var AZ_300 = 0;
 				var AZ_160 = 0;
+
 				if (aq > 0) {
 					if (document.querySelector('iframe[width="300"]') !== null) {
 						var a1 = document.querySelector('iframe[width="300"]');
@@ -202,6 +224,7 @@ pluginnetwork.contentscript = function () {
 				}
 			}
 		},
+
 		contentUpdate: function () {
 			if (!pluginnetwork.contentscript.documentParsed) return;
 			if (pluginnetwork.contentscript.onDomInsertedTimer) {
@@ -212,6 +235,7 @@ pluginnetwork.contentscript = function () {
 				onDomInsertedTimer = null;
 			}, 300);
 		},
+
 		init: function () {
 			if (pluginnetwork.contentscript.initialized) return; // we're init'd return    
 			if (pluginnetwork.pluginStorage.initialized) {
@@ -230,7 +254,6 @@ pluginnetwork.contentscript = function () {
 	}
 }();
 pluginnetwork.contentscript.init();
-//
-// Porting to mutation obervers once support is available on more than chrome
+
 document.addEventListener("DOMContentLoaded", pluginnetwork.contentscript.init, false);
 document.addEventListener("DOMNodeInserted", pluginnetwork.contentscript.contentUpdate, false);

@@ -28,7 +28,7 @@ pluginnetwork.background = function () {
 			xhr.open("GET", url, true);
 			xhr.onreadystatechange = function () {
 				if (xhr.readyState == 4) {
-					if (pluginnetwork.helpers.IsJsonString(xhr.responseText)) {
+					if (pluginnetwork.helpers.isJsonString(xhr.responseText)) {
 						var resp = JSON.parse(xhr.responseText);
 						if (resp.currentVersion > versionNumber) {
 							if (typeof (resp.tdb) !== "undefined") {

@@ -39,7 +39,6 @@ var localCopy = {};
 var gestures = {};
 var settings = {};
 
-
 ///////////////////////////////////////////////////////////
 // System Defaults ////////////////////////////////////////
 ///////////////////////////////////////////////////////////
@@ -246,7 +245,6 @@ var categories = {
 	'cat_external': { externalActions: true },
 	'cat_settings': { settings: true }
 }
-
 
 ///////////////////////////////////////////////////////////
 // Action Functions ///////////////////////////////////////
@@ -720,10 +718,12 @@ var actions = {
 	}
 }
 
-
 var runCustomAction = function (action, id, call, mess) {
 	var action = customActions[action];
-	if (!action) return;
+
+	if (!action)
+		return;
+
 	if (action.env == "page") {
 		runJS(id, action.code);
 		setTimeout(call, 50);
@@ -733,9 +733,6 @@ var runCustomAction = function (action, id, call, mess) {
 		setTimeout(call, 50);
 	}
 }
-
-
-
 
 ///////////////////////////////////////////////////////////
 // Window Position Hacks //////////////////////////////////
@@ -839,8 +836,6 @@ chrome.extension.onConnect.addListener(function (port) {
 	}
 });
 
-
-
 // External ///////////////////////////////////////////////
 ///////////////////////////////////////////////////////////
 chrome.extension.onRequestExternal.addListener(function (request, sender, respond) {
@@ -892,21 +887,34 @@ chrome.extension.onConnectExternal.addListener(function (port) {
 	}
 });
 
+///////////////////////////////////////////////////////////
 // Handle Gesture /////////////////////////////////////////
 ///////////////////////////////////////////////////////////
 var contentMessage = function (id, mess) {
 	mess = JSON.parse(mess);
-	if (mess.selection && mess.selection.length > 0 && gestures["s" + mess.gesture]) mess.gesture = "s" + mess.gesture;
-	else if (mess.links && mess.links.length > 0 && gestures["l" + mess.gesture]) mess.gesture = "l" + mess.gesture;
-	else if (mess.images && mess.images.length > 0 && gestures["i" + mess.gesture]) mess.gesture = "i" + mess.gesture;
+	if (mess.selection && mess.selection.length > 0 && gestures["s" + mess.gesture])
+		mess.gesture = "s" + mess.gesture;
+	else if (mess.links && mess.links.length > 0 && gestures["l" + mess.gesture])
+		mess.gesture = "l" + mess.gesture;
+	else if (mess.images && mess.images.length > 0 && gestures["i" + mess.gesture])
+		mess.gesture = "i" + mess.gesture;
 
 	if (mess.gesture && gestures[mess.gesture]) {
-		if (chainGesture) clearTimeout(chainGesture.timeout);
+		if (chainGesture)
+			clearTimeout(chainGesture.timeout);
 		chainGesture = null;
-		if (mess.gesture[0] == "r") chainGesture = { rocker: true, timeout: setTimeout(function () { chainGesture = null }, 2000) };
-		if (mess.gesture[0] == "w") chainGesture = { wheel: true, timeout: setTimeout(function () { chainGesture = null }, 2000) };
-		if (chainGesture && mess.buttonDown) chainGesture.buttonDown = mess.buttonDown;
-		if (chainGesture && mess.startPoint) chainGesture.startPoint = mess.startPoint;
+		if (mess.gesture[0] == "r")
+			chainGesture = { rocker: true, timeout: setTimeout(function () { chainGesture = null }, 2000) };
+
+		if (mess.gesture[0] == "w")
+			chainGesture = { wheel: true, timeout: setTimeout(function () { chainGesture = null }, 2000) };
+
+		if (chainGesture && mess.buttonDown)
+			chainGesture.buttonDown = mess.buttonDown;
+
+		if (chainGesture && mess.startPoint)
+			chainGesture.startPoint = mess.startPoint;
+
 		var call = !chainGesture ? null : function () {
 			chrome.tabs.getSelected(null, function (tab) {
 				if (!chainGesture) return;
@@ -916,6 +924,7 @@ var contentMessage = function (id, mess) {
 						contents[id].postMessage(JSON.stringify({ chain: chainGesture }));
 			});
 		}
+
 		try {
 			if (actions[gestures[mess.gesture]])
 				actions[gestures[mess.gesture]].call(null, id, call, mess);
@@ -924,12 +933,21 @@ var contentMessage = function (id, mess) {
 			else
 				runCustomAction(gestures[mess.gesture], id, call, mess);
 		} catch (err) { }
-		if (!log.action) log.action = {};
-		if (!log.action[gestures[mess.gesture]]) log.action[gestures[mess.gesture]] = {};
-		if (!log.action[gestures[mess.gesture]][mess.gesture]) log.action[gestures[mess.gesture]][mess.gesture] = { count: 0 };
+
+		if (!log.action)
+			log.action = {};
+
+		if (!log.action[gestures[mess.gesture]])
+			log.action[gestures[mess.gesture]] = {};
+
+		if (!log.action[gestures[mess.gesture]][mess.gesture])
+			log.action[gestures[mess.gesture]][mess.gesture] = { count: 0 };
+
 		log.action[gestures[mess.gesture]][mess.gesture].count += 1;
 
-		if (!log.line) log.line = { distance: 0, segments: 0 };
+		if (!log.line)
+			log.line = { distance: 0, segments: 0 };
+
 		if (mess.line) {
 			log.line.distance += mess.line.distance;
 			log.line.segments += mess.line.segments;
@@ -940,6 +958,7 @@ var contentMessage = function (id, mess) {
 			if (!chainGesture.buttonDown) chainGesture.buttonDown = {};
 			chainGesture.buttonDown[mess.syncButton.id] = mess.syncButton.down;
 		}
+
 		setTimeout(function () {
 			chrome.tabs.getSelected(null, function (tab) {
 				for (id in contents)
@@ -949,25 +968,27 @@ var contentMessage = function (id, mess) {
 		}, 20);
 	}
 	if (mess.alertDoubleclick) {
-		if (window.rightclickPopup) window.rightclickPopup.close();
+		if (window.rightclickPopup)
+			window.rightclickPopup.close();
+
 		var width = 750;
 		var height = 230;
 		var wtop = mess.alertDoubleclick.centerY - height / 1.5;
 		var wleft = mess.alertDoubleclick.centerX - width / 2;
 		window.rightclickPopup = window.open("rightclick.html", "rightclick", "width=" + width + ",height=" + height + ",top=" + wtop + ",left=" + wleft);
 	}
+
 	if (mess.closetab) {
 		if (mess.closetab == true) mess.closetab = contents[id].detail.tabId;
 		chrome.tabs.get(mess.closetab, function (tab) {
 			chrome.tabs.remove(tab.id);
 		});
 	}
+
 	if (mess.sgplugin && pluginport) {
 		if (mess.sgplugin.rightclick) pluginport.postMessage(JSON.stringify({ sendbutton: 3 }));
 	}
 }
-
-
 
 // Connect Tabs ///////////////////////////////////////////
 ///////////////////////////////////////////////////////////
@@ -997,14 +1018,12 @@ var initConnectTab = function (port) {
 	refreshPageAction(tab.id);
 }
 
-
 // Execute Code on Tab ////////////////////////////////////
 ///////////////////////////////////////////////////////////
 var runJS = function (id, JS) {
 	var mess = { eval: JS };
 	if (contents[id]) contents[id].postMessage(JSON.stringify(mess));
 }
-
 
 ///////////////////////////////////////////////////////////
 // Tab Events /////////////////////////////////////////////
@@ -1096,10 +1115,6 @@ chrome.tabs.onRemoved.addListener(function (tabId) {
 chrome.windows.onRemoved.addListener(function (winId) {
 	focusedWindows = focusedWindows.filter(function (el) { return (el != winId) });
 });
-
-
-
-
 
 ///////////////////////////////////////////////////////////
 // Utilities //////////////////////////////////////////////
@@ -1223,25 +1238,6 @@ var refreshPageAction = function (tabId) {
 	});
 }
 
-
-
-
-
-
-///////////////////////////////////////////////////////////
-// Send Usage Stats ///////////////////////////////////////
-///////////////////////////////////////////////////////////
-var ping = function (force) {
-}
-var sendStats = function () {
-}
-
-
-
-
-
-
-
 ///////////////////////////////////////////////////////////
 // Setting Storage ////////////////////////////////////////
 ///////////////////////////////////////////////////////////
@@ -1277,12 +1273,17 @@ var saveOptions = function (profile, call) {
 		contents[id].postMessage(JSON.stringify({ settings: settings, validGestures: validGestures }));
 
 	setValue('profile-' + profile, { gestures: gestures, settings: settings }, true, call);
-	if (bookmarksync) bookmarksync.get(function (m, value) {
-		if (!value) value = {};
-		value.gestures = gestures;
-		value.settings = settings;
-		bookmarksync.set(value);
-	});
+
+	if (bookmarksync) {
+		bookmarksync.get(function (m, value) {
+			if (!value)
+				value = {};
+
+			value.gestures = gestures;
+			value.settings = settings;
+			bookmarksync.set(value);
+		});
+	}
 }
 var loadOptions = function (profile, call) {
 	gestures = JSON.parse(defaults['Smooth Gestures'].gestures);
@@ -1351,11 +1352,16 @@ var loadLog = function (fromdefault) {
 ///////////////////////////////////////////////////////////
 var checkLocalStorage = function () {
 	var val = null;
+
 	try {
 		val = localStorage.getItem("id");
 	} catch (e) { }
-	if (!val) for (id in localCopy)
-		setValue(id, localCopy[id]);
+
+	if (!val) {
+		for (id in localCopy) {
+			setValue(id, localCopy[id]);
+		}
+	}
 }
 
 // Backup LocalStorage ////////////////////////////////////
@@ -1364,25 +1370,15 @@ var enableSync = function () {
 	return;//block bsync for now
 }
 var disableSync = function () {
-	if (bookmarksync) bookmarksync.destroy();
+	if (bookmarksync)
+		bookmarksync.destroy();
+
 	bookmarksync = null;
 }
-
-
-
-
-
-
-
-
-
-
-
 
 ///////////////////////////////////////////////////////////
 // Initialize /////////////////////////////////////////////
 ///////////////////////////////////////////////////////////
-
 var initialize = function () {
 	setValue('date_started', (new Date()).toString());
 	//detect and update first run on this browser
@@ -1466,18 +1462,11 @@ var connectExistingTabs = function () {
 		});
 	});
 }
-
-
-
-
-
 for (var i = 0; i < localStorage.length; i++)
 	localCopy[localStorage.key(i)] = localStorage.getItem(localStorage.key(i));
 
-instanceId = getValue("id") || ("" + Math.random()).substr(2);
+instanceId = getValue("id") || ('' + Math.random()).substr(2);
 profile = getValue("profile") || "Default";
-
-
 
 loadOptions(profile, function () {
 	loadCustomActions();
@@ -1486,12 +1475,10 @@ loadOptions(profile, function () {
 	loadLog();
 	setInterval(saveLog, 60000); //once every minute
 
-	if (settings.sync) enableSync();
+	if (settings.sync)
+		enableSync();
 
 	setInterval(checkLocalStorage, 10 * 60000); //once every 10 minutes
-
-	setTimeout(ping, 1000);
-	setInterval(ping, 60 * 60 * 1000); //once an hour
 
 	$.getJSON(chrome.extension.getURL("manifest.json"), null, function (data) {
 		extVersion = data.version;
