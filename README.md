@@ -6,3 +6,6 @@ The continuing effort will be:
 
 1. Remove the malicious codes which send usage data and decrease extension performance.
 2. Continue the bug fixing and improve the functionality.
+
+# Downloads
+[Smooth Gesture 1.0](https://github.com/downloads/masonaxcte/Smooth-Gestures/smoothgestures%201.0.crx)
