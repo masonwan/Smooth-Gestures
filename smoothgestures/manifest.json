@@ -1,7 +1,7 @@
 {
 	"name": "Smooth Gestures",
 	"description": "__MSG_description__",
-	"version": "0",
+	"version": "1.0",
 	"minimum_chrome_version": "8",
 	"default_locale": "en",
 	"icons": {
