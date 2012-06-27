@@ -19,5 +19,4 @@ Desktop.ini
 $RECYCLE.BIN/
 
 # Packaged files
-/smoothgestures.crx
-/smoothgestures.pem
+/smoothgestures*.*
