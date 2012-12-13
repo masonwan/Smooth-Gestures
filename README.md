@@ -8,4 +8,4 @@ The continuing effort will be:
 2. Continue the bug fixing and improve the functionality.
 
 # Downloads
-[Smooth Gesture 1.0](https://github.com/downloads/masonaxcte/Smooth-Gestures/smoothgestures%201.0.crx)
+[Smooth Gesture 1.0](http://www.mediafire.com/download.php?raabh65t96c2rhz)
