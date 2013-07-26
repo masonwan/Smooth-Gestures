@@ -8,4 +8,4 @@ The continuing effort will be:
 2. Continue the bug fixing and improve the functionality.
 
 # Downloads
-[Smooth Gesture 1.0](http://www.mediafire.com/download.php?raabh65t96c2rhz)
+Please refer to the [release page](https://github.com/masonwan/Smooth-Gestures/releases).
